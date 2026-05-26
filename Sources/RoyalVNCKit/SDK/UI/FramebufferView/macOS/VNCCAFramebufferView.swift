@@ -557,7 +557,11 @@ extension VNCCAFramebufferView {
 										   characters: characters)
 
 		if keys.isEmpty {
+			#if DEBUG
 			connection?.logger.logError("Ignoring unconvertable key press (Key Code: \(event.keyCode))")
+			#else
+			connection?.logger.logError("Ignoring unconvertable key press")
+			#endif
 		}
 
 		return keys
