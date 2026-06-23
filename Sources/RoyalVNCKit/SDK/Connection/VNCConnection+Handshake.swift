@@ -4,6 +4,10 @@ import FoundationEssentials
 import Foundation
 #endif
 
+#if canImport(os)
+import os
+#endif
+
 // MARK: - Entry Point for Handshaking Phase
 extension VNCConnection {
 	func handshake() async throws {
@@ -121,6 +125,20 @@ private extension VNCConnection {
 			  supportedTypes.securityTypes.contains(chosenSecurityType) else {
 			throw VNCError.authentication(.clientCouldNotDecideOnSecurityType)
 		}
+
+		// DIAGNOSTIC (VNC lock-on-disconnect, task #36): record which security
+		// types the server OFFERS and which we SELECT. Confirms the root-cause
+		// hypothesis — we negotiate the legacy `diffieHellman` (ARD) path, and
+		// whether the Mac even offers Apple's private `apple33/34/35/36` types that
+		// Screen Sharing.app uses. os_log so it's captured by `idevicesyslog`
+		// (grep `VNCDIAG`). Benign + low-volume (once per connection).
+		#if canImport(os)
+		if #available(iOS 14.0, macOS 11.0, *) {
+			let offered = supportedSecurityTypes.map { "\($0)(\($0.rawValue))" }.joined(separator: ", ")
+			os.Logger(subsystem: "VNCDIAG", category: "handshake").info(
+				"security types offered: [\(offered, privacy: .public)] → chose: \(String(describing: chosenSecurityType), privacy: .public)(\(chosenSecurityType.rawValue, privacy: .public))")
+		}
+		#endif
 
 		try await sendAuthenticationData(securityType: chosenSecurityType)
 	}
