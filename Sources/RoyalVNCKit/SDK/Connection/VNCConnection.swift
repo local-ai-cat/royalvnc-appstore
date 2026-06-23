@@ -289,6 +289,7 @@ extension VNCConnection {
 		guard !state.disconnectRequested else { return }
 
 		state.disconnectRequested = true
+		cancelWaitingGrace()
 		updateConnectionState(.disconnecting)
 
 		connection.setStatusUpdateHandler(nil)
@@ -336,24 +337,50 @@ private extension VNCConnection {
 			case .preparing:
 				logger.logDebug("Connection State - Preparing")
 
+				// A viable path was found and the connection is establishing — it has
+				// left `.waiting`, so drop the grace timer.
+				cancelWaitingGrace()
+
 			case .ready:
 				logger.logDebug("Connection State - Ready")
 
+				cancelWaitingGrace()
 				connectionDidBecomeReady()
 
 			case .waiting(let error):
-				logger.logDebug("Connection State - Waiting with error: \(error)")
+				// NWConnection enters `.waiting` when it temporarily lacks a viable
+				// path (Wi-Fi⇄cellular handoff, brief network loss, app resuming from
+				// suspension). How we react depends on whether the session is already up:
+				if state.didBecomeReady {
+					// Established session lost its path. Fail promptly so the higher-level
+					// reconnect machine rebuilds a fresh connection — don't silently stall
+					// the UI on a stale framebuffer waiting for a recovery that may not come.
+					logger.logDebug("Connection State - Waiting after established — failing to trigger reconnect: \(error)")
 
-				connectionDidFail(error: .connection(.failed(error)))
+					connectionDidFail(error: .connection(.failed(error)))
+				} else {
+					// Pre-establishment: NWConnection is still trying to reach the host.
+					// This is RECOVERABLE — it keeps retrying and transitions to `.ready`
+					// on its own (e.g. once the new Wi-Fi path comes up). Failing on the
+					// first `.waiting` tore down otherwise-recoverable connects and, under
+					// the reconnect machine, drove a connection storm (every retry failing
+					// instantly). So tolerate it, but bound the wait with a grace timer so a
+					// genuinely unreachable host still fails instead of hanging forever.
+					logger.logDebug("Connection State - Waiting (pre-ready, allowing grace) with error: \(error)")
+
+					scheduleWaitingGrace(error: error)
+				}
 
 			case .failed(let error):
 				logger.logDebug("Connection State - Failed with error: \(error)")
 
+				cancelWaitingGrace()
 				connectionDidFail(error: .connection(.failed(error)))
 
 			case .cancelled:
 				logger.logDebug("Connection State - Cancelled")
 
+				cancelWaitingGrace()
 				connectionDidFail(error: .connection(.cancelled))
 
             case .unknown(let underlyingState):
@@ -362,6 +389,17 @@ private extension VNCConnection {
 	}
 
 	func connectionDidBecomeReady() {
+		// Run the VNC handshake exactly once per connection. Re-running it on an
+		// already-established session would corrupt the protocol stream. (A post-
+		// establishment `.waiting` now fails the connection rather than recovering,
+		// so a second `.ready` shouldn't occur — but guard regardless.)
+		guard !state.didBecomeReady else {
+			logger.logDebug("Connection State - Ready (again, already handshook) — ignoring")
+
+			return
+		}
+		state.didBecomeReady = true
+
 		Task {
 			do {
 				try await handshake()
@@ -381,5 +419,43 @@ private extension VNCConnection {
 
 	func connectionDidFail(error: VNCError) {
 		handleBreakingError(error)
+	}
+
+	/// How long a pre-`.ready` connection is allowed to sit in `.waiting` (retrying
+	/// for a viable path) before we give up and fail. Slightly under the socket's
+	/// 15s `connectionTimeout` so this is the effective bound for the "no path yet"
+	/// case (where the TCP-level timeout may not fire on its own).
+	private var waitingGraceInterval: TimeInterval { 12 }
+
+	/// Schedule (or refresh) the grace timer for a pre-`.ready` `.waiting`. If the
+	/// connection hasn't become ready or been torn down by the time it fires, fail
+	/// it so the higher-level reconnect machine can react. Runs on the connection
+	/// queue, matching where state transitions are delivered.
+	func scheduleWaitingGrace(error: Error) {
+		state.waitingGraceWorkItem?.cancel()
+
+		let work = DispatchWorkItem { [weak self] in
+			guard let self else { return }
+			guard !self.state.didBecomeReady, !self.state.disconnectRequested else { return }
+
+			// `queue` is concurrent, so this can run alongside a state-change callback
+			// and `cancel()` can't stop an already-started closure. Gate on NWConnection's
+			// own thread-safe live status: only fail if it's *still* `.waiting`. If it has
+			// moved on (`.preparing`/`.ready`/etc.) it's making progress, so leave it be —
+			// this is race-free against any forward transition, not just `.ready`.
+			guard case .waiting = self.connection.status else { return }
+
+			self.logger.logDebug("Connection State - Waiting grace expired — failing")
+			self.connectionDidFail(error: .connection(.failed(error)))
+		}
+
+		state.waitingGraceWorkItem = work
+		queue.asyncAfter(deadline: .now() + waitingGraceInterval, execute: work)
+	}
+
+	/// Cancel any pending waiting-grace timer (the connection left `.waiting`).
+	func cancelWaitingGrace() {
+		state.waitingGraceWorkItem?.cancel()
+		state.waitingGraceWorkItem = nil
 	}
 }
