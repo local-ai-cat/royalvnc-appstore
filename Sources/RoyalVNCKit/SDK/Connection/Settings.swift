@@ -52,6 +52,11 @@ public extension VNCConnection {
 #if canImport(ObjectiveC)
 		@objc
 #endif
+		public let isClipboardAutoSyncEnabled: Bool
+
+#if canImport(ObjectiveC)
+		@objc
+#endif
 		public let colorDepth: ColorDepth
 
 		public let frameEncodings: [VNCFrameEncodingType]
@@ -63,6 +68,29 @@ public extension VNCConnection {
 			frameEncodings.map({ $0.rawValue.rawValue })
 		}
 
+		public convenience init(isDebugLoggingEnabled: Bool,
+								hostname: String,
+								port: UInt16,
+								isShared: Bool,
+								isScalingEnabled: Bool,
+								useDisplayLink: Bool,
+								inputMode: InputMode,
+								isClipboardRedirectionEnabled: Bool,
+								colorDepth: ColorDepth,
+								frameEncodings: [VNCFrameEncodingType]) {
+			self.init(isDebugLoggingEnabled: isDebugLoggingEnabled,
+					  hostname: hostname,
+					  port: port,
+					  isShared: isShared,
+					  isScalingEnabled: isScalingEnabled,
+					  useDisplayLink: useDisplayLink,
+					  inputMode: inputMode,
+					  isClipboardRedirectionEnabled: isClipboardRedirectionEnabled,
+					  isClipboardAutoSyncEnabled: true,
+					  colorDepth: colorDepth,
+					  frameEncodings: frameEncodings)
+		}
+
 		public init(isDebugLoggingEnabled: Bool,
 					hostname: String,
 					port: UInt16,
@@ -71,6 +99,7 @@ public extension VNCConnection {
 					useDisplayLink: Bool,
 					inputMode: InputMode,
 					isClipboardRedirectionEnabled: Bool,
+					isClipboardAutoSyncEnabled: Bool,
 					colorDepth: ColorDepth,
 					frameEncodings: [VNCFrameEncodingType]) {
 			self.isDebugLoggingEnabled = isDebugLoggingEnabled
@@ -86,6 +115,7 @@ public extension VNCConnection {
 			self.inputMode = inputMode
 
 			self.isClipboardRedirectionEnabled = isClipboardRedirectionEnabled
+			self.isClipboardAutoSyncEnabled = isClipboardAutoSyncEnabled
 
 			self.colorDepth = colorDepth
 			self.frameEncodings = frameEncodings
@@ -104,6 +134,33 @@ public extension VNCConnection {
 								isClipboardRedirectionEnabled: Bool,
 								colorDepth: ColorDepth,
 								frameEncodings: [Int64]) {
+			self.init(isDebugLoggingEnabled: isDebugLoggingEnabled,
+					  hostname: hostname,
+					  port: port,
+					  isShared: isShared,
+					  isScalingEnabled: isScalingEnabled,
+					  useDisplayLink: useDisplayLink,
+					  inputMode: inputMode,
+					  isClipboardRedirectionEnabled: isClipboardRedirectionEnabled,
+					  isClipboardAutoSyncEnabled: true,
+					  colorDepth: colorDepth,
+					  frameEncodings: frameEncodings)
+		}
+
+#if canImport(ObjectiveC)
+		@objc
+#endif
+		public convenience init(isDebugLoggingEnabled: Bool,
+								hostname: String,
+								port: UInt16,
+								isShared: Bool,
+								isScalingEnabled: Bool,
+								useDisplayLink: Bool,
+								inputMode: InputMode,
+								isClipboardRedirectionEnabled: Bool,
+								isClipboardAutoSyncEnabled: Bool,
+								colorDepth: ColorDepth,
+								frameEncodings: [Int64]) {
 			let frameEncodingsSwift: [VNCFrameEncodingType] = frameEncodings.compactMap({
 				guard let objcFrameEncodingType = _ObjC_VNCFrameEncodingType(rawValue: $0) else { return nil }
 
@@ -118,6 +175,7 @@ public extension VNCConnection {
 					  useDisplayLink: useDisplayLink,
 					  inputMode: inputMode,
 					  isClipboardRedirectionEnabled: isClipboardRedirectionEnabled,
+					  isClipboardAutoSyncEnabled: isClipboardAutoSyncEnabled,
 					  colorDepth: colorDepth,
 					  frameEncodings: frameEncodingsSwift)
 		}

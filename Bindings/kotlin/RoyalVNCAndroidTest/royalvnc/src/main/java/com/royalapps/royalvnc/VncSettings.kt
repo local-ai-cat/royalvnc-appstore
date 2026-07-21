@@ -15,6 +15,7 @@ data class VncSettings(
             useDisplayLink: Boolean,
             inputMode: VncInputMode,
             isClipboardRedirectionEnabled: Boolean,
+            isClipboardAutoSyncEnabled: Boolean = true,
             colorDepth: VncColorDepth,
             frameEncodings: Array<VncFrameEncodingType>?
         ): VncSettings {
@@ -24,7 +25,7 @@ data class VncSettings(
                 null
             }
 
-            val ptr = RoyalVNCKit.rvnc_settings_create(
+            val ptr = RoyalVNCKit.rvnc_settings_create_with_clipboard_auto_sync(
                 isDebugLoggingEnabled.toCByte(),
                 hostname,
                 port,
@@ -33,6 +34,7 @@ data class VncSettings(
                 useDisplayLink.toCByte(),
                 inputMode.rawValue,
                 isClipboardRedirectionEnabled.toCByte(),
+                isClipboardAutoSyncEnabled.toCByte(),
                 colorDepth.rawValue,
                 frameEncodingsC?.ptr
             )

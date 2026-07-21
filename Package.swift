@@ -14,7 +14,7 @@ zTarget = Target.target(name: "Z", path: "Sources/zlib-1.3.1", cSettings: [
     .define("HAVE_HIDDEN"),
 
     .unsafeFlags([
-        disableDeprecatedDeclarationsWarning,
+        disableDeprecatedDeclarationsWarning
     ])
 ])
 #else
@@ -90,6 +90,11 @@ let package = Package(
 
         .executableTarget(
             name: "RoyalVNCKitCDemo",
+            dependencies: [ "RoyalVNCKit" ]
+        ),
+
+        .testTarget(
+            name: "RoyalVNCKitTests",
             dependencies: [ "RoyalVNCKit" ]
         )
     ]

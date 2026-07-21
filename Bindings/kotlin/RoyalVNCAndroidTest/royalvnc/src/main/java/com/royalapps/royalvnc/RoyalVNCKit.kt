@@ -252,6 +252,20 @@ object RoyalVNCKit {
         frameEncodings: Pointer? /* rvnc_settings_t */
     ): Pointer /* rvnc_settings_t */
 
+    external fun rvnc_settings_create_with_clipboard_auto_sync(
+        isDebugLoggingEnabled: Byte,
+        hostname: String,
+        port: Short /* uint16_t */,
+        isShared: Byte,
+        isScalingEnabled: Byte,
+        useDisplayLink: Byte,
+        inputMode: Int /* VncInputMode */,
+        isClipboardRedirectionEnabled: Byte,
+        isClipboardAutoSyncEnabled: Byte,
+        colorDepth: Int /* VncColorDepth */,
+        frameEncodings: Pointer? /* rvnc_settings_t */
+    ): Pointer /* rvnc_settings_t */
+
     external fun rvnc_settings_destroy(
         settings: Pointer /* rvnc_settings_t */
     )
