@@ -34,6 +34,12 @@ extension VNCConnection: VNCClipboardMonitorDelegate {
 		guard settings.isClipboardRedirectionEnabled,
 			  settings.isClipboardAutoSyncEnabled else { return }
 
-		enqueueClientCutTextMessage(text)
+		if state.extendedClipboardServerCapabilities == nil {
+			_ = sendClassicClipboardText(text)
+		} else {
+			Task { [weak self] in
+				_ = await self?.sendClipboardText(text)
+			}
+		}
 	}
 }
