@@ -42,6 +42,12 @@ extension VNCConnection {
 
 		var areContinuousUpdatesSupported = false
 		var areContinuousUpdatesEnabled = false
+
+		var extendedClipboardServerCapabilities: VNCExtendedClipboardCapabilities?
+		var pendingClipboardText: String?
+		var nextClipboardSendID: UInt64 = 0
+		var pendingClipboardSendID: UInt64?
+		var completedClipboardSendID: UInt64?
 	}
 }
 

@@ -58,20 +58,14 @@ extension VNCConnection {
 		enqueueClientToServerMessage(pointerEvent)
 	}
 
-	func enqueueClientCutTextMessage(_ text: String) {
-		let clientCutTextMessage = VNCProtocol.ClientCutText(text: text)
-
-		enqueueClientToServerMessage(clientCutTextMessage)
-	}
-
 	func enqueueClientToServerMessage(_ message: VNCSendableMessage) {
 		clientToServerMessageQueue.enqueue(message)
 	}
 
-    func normalizedMousePosition(x: UInt16,
-                                 y: UInt16) -> VNCProtocol.MousePosition {
-        var normalizedX = x
-        var normalizedY = y
+	func normalizedMousePosition(x horizontalPosition: UInt16,
+							 y verticalPosition: UInt16) -> VNCProtocol.MousePosition {
+		var normalizedX = horizontalPosition
+		var normalizedY = verticalPosition
 
         let framebufferWidth = framebuffer?.size.width ?? 0
         let framebufferHeight = framebuffer?.size.height ?? 0

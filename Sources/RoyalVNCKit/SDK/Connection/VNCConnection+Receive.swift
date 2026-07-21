@@ -103,11 +103,13 @@ private extension VNCConnection {
 		let serverCutText = try await VNCProtocol.ServerCutText.receive(connection: connection,
 																		logger: logger)
 
-		let text = serverCutText.text
+		if let extended = serverCutText.extended {
+			try handleExtendedServerCutText(extended)
+		} else {
+			updateClipboardFromServer(serverCutText.text)
+		}
 
 		logger.logDebug("Received Clipboard Text from Server")
-
-		updateClipboardFromServer(text)
 	}
 
 	func handleBellMessage() async throws {
@@ -138,6 +140,45 @@ private extension VNCConnection {
 }
 
 extension VNCConnection {
+	func handleExtendedServerCutText(
+		_ message: VNCExtendedServerCutText
+	) throws {
+		typealias Action = VNCExtendedClipboardAction
+		typealias Format = VNCExtendedClipboardFormat
+
+		switch message.action {
+			case Action.caps:
+				state.extendedClipboardServerCapabilities = message.serverCapabilities
+				enqueueClientToServerMessage(try VNCProtocol.ClientCutText.extendedClipboardCapabilities())
+
+			case Action.request:
+				guard message.formats.contains(.text),
+					  let text = state.pendingClipboardText,
+					  let sendID = state.pendingClipboardSendID else { return }
+				enqueueClientToServerMessage(try VNCProtocol.ClientCutText.extendedClipboardProvide(text: text))
+				state.completedClipboardSendID = sendID
+				state.pendingClipboardText = nil
+				state.pendingClipboardSendID = nil
+
+			case Action.peek:
+				let formats: Format = state.pendingClipboardText == nil ? [] : .text
+				enqueueClientToServerMessage(try VNCProtocol.ClientCutText.extendedClipboardNotify(formats: formats))
+
+			case Action.notify:
+				guard message.formats.contains(.text),
+					  state.extendedClipboardServerCapabilities?.actions.contains(.request) == true else { return }
+				enqueueClientToServerMessage(try VNCProtocol.ClientCutText.extendedClipboardRequest(formats: .text))
+
+			case Action.provide:
+				if let text = message.text {
+					updateClipboardFromServer(text)
+				}
+
+			default:
+				throw VNCError.protocol(.unexpectedExtendedServerCutTextAction(action: message.action.rawValue))
+		}
+	}
+
 	func updateClipboardFromServer(_ text: String) {
 		guard settings.isClipboardRedirectionEnabled else { return }
 

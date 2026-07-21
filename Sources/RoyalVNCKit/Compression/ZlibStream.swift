@@ -6,6 +6,37 @@ import Foundation
 
 @_implementationOnly import Z
 
+enum ZlibDeflateError: Error {
+	case compressionFailed(status: Int32)
+}
+
+enum ZlibDeflate {
+	static func compress(_ data: Data) throws -> Data {
+		let sourceLength = uLong(data.count)
+		var destinationLength = compressBound(sourceLength)
+		var compressedData = Data(count: Int(destinationLength))
+
+		let status = compressedData.withUnsafeMutableBytes { destinationBuffer in
+			data.withUnsafeBytes { sourceBuffer in
+				compress2(
+					destinationBuffer.bindMemory(to: Bytef.self).baseAddress,
+					&destinationLength,
+					sourceBuffer.bindMemory(to: Bytef.self).baseAddress,
+					sourceLength,
+					Z_DEFAULT_COMPRESSION
+				)
+			}
+		}
+
+		guard status == Z_OK else {
+			throw ZlibDeflateError.compressionFailed(status: status)
+		}
+
+		compressedData.count = Int(destinationLength)
+		return compressedData
+	}
+}
+
 final class ZlibStream {
 	private let stream: ZlibInflateStream
 
