@@ -13,7 +13,7 @@ import UIKit
 #endif
 
 final class VNCClipboardMonitor {
-	let clipboard: VNCClipboard
+	let clipboard: any VNCClipboardAccessing
 	let monitoringInterval: TimeInterval
 	let tolerance: TimeInterval
 
@@ -27,7 +27,7 @@ final class VNCClipboardMonitor {
 
 	private var lastChangeCount = 0
 
-	init(clipboard: VNCClipboard,
+	init(clipboard: any VNCClipboardAccessing,
 		 monitoringInterval: TimeInterval,
 		 tolerance: TimeInterval) {
 		self.clipboard = clipboard

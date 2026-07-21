@@ -41,6 +41,7 @@ static class Program
             UseDisplayLink = false,
             InputMode = InputMode.None,
             IsClipboardRedirectionEnabled = false,
+            IsClipboardAutoSyncEnabled = true,
             ColorDepth = ColorDepth.Bits24,
             FrameEncodings = frameEncodings
         };
@@ -147,6 +148,7 @@ static class Program
         public InputMode InputMode { get; init; }
         public ColorDepth ColorDepth { get; init; }
         public bool IsClipboardRedirectionEnabled { get; init; }
+        public bool IsClipboardAutoSyncEnabled { get; init; }
         public bool IsDebugLoggingEnabled { get; init; }
         public bool IsScalingEnabled { get; init; }
         public bool IsShared { get; init; }

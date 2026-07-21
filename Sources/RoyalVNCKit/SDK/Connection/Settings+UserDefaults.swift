@@ -66,6 +66,7 @@ private extension VNCConnection.Settings {
 		private let useDisplayLinkKey = "useDisplayLink"
 		private let inputModeKey = "inputMode"
 		private let isClipboardRedirectionEnabledKey = "isClipboardRedirectionEnabled"
+		private let isClipboardAutoSyncEnabledKey = "isClipboardAutoSyncEnabled"
 		private let colorDepthKey = "colorDepth"
 		private let frameEncodingsKey = "frameEncodings"
 
@@ -85,6 +86,7 @@ private extension VNCConnection.Settings {
 				useDisplayLinkKey: false,
 				inputModeKey: InputMode.forwardKeyboardShortcutsIfNotInUseLocally.rawValue,
 				isClipboardRedirectionEnabledKey: true,
+				isClipboardAutoSyncEnabledKey: true,
 				colorDepthKey: ColorDepth.depth24Bit.rawValue,
 				frameEncodingsKey: VNCFrameEncodingType.defaultFrameEncodings.encode()
 			])
@@ -130,6 +132,11 @@ private extension VNCConnection.Settings {
 			set { defaults.set(newValue, forKey: isClipboardRedirectionEnabledKey) }
 		}
 
+		var isClipboardAutoSyncEnabled: Bool {
+			get { defaults.bool(forKey: isClipboardAutoSyncEnabledKey) }
+			set { defaults.set(newValue, forKey: isClipboardAutoSyncEnabledKey) }
+		}
+
 		var frameEncodings: [VNCFrameEncodingType] {
 			get {
 				guard let encodedValue = defaults.stringArray(forKey: frameEncodingsKey) else {
@@ -161,6 +168,7 @@ private extension VNCConnection.Settings {
 			useDisplayLink = settings.useDisplayLink
 			inputMode = settings.inputMode
 			isClipboardRedirectionEnabled = settings.isClipboardRedirectionEnabled
+			isClipboardAutoSyncEnabled = settings.isClipboardAutoSyncEnabled
 			colorDepth = settings.colorDepth
 			frameEncodings = settings.frameEncodings
 		}
@@ -174,6 +182,7 @@ private extension VNCConnection.Settings {
 				  useDisplayLink: useDisplayLink,
 				  inputMode: inputMode,
 				  isClipboardRedirectionEnabled: isClipboardRedirectionEnabled,
+				  isClipboardAutoSyncEnabled: isClipboardAutoSyncEnabled,
 				  colorDepth: colorDepth,
 				  frameEncodings: frameEncodings)
 		}

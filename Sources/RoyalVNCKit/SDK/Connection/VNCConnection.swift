@@ -63,7 +63,7 @@ public final class VNCConnection: NSObjectOrAnyObject {
 	let state = State()
 	let systemSound = VNCSystemSound()
 
-	let clipboard: VNCClipboard
+	let clipboard: any VNCClipboardAccessing
 	let clipboardMonitor: VNCClipboardMonitor
 
 	var clientToServerMessageQueue = Queue<VNCSendableMessage>()
@@ -191,10 +191,22 @@ public final class VNCConnection: NSObjectOrAnyObject {
 	}
 
 	// MARK: - Public Initializers
-    public init(settings: Settings,
-                logger: VNCLogger,
-                framebufferAllocator: VNCFramebufferAllocator?,
-                context: UnsafeMutableRawPointer?) {
+	public convenience init(settings: Settings,
+							logger: VNCLogger,
+							framebufferAllocator: VNCFramebufferAllocator?,
+							context: UnsafeMutableRawPointer?) {
+		self.init(settings: settings,
+				  logger: logger,
+				  framebufferAllocator: framebufferAllocator,
+				  context: context,
+				  clipboard: VNCClipboard())
+	}
+
+	init(settings: Settings,
+		 logger: VNCLogger,
+		 framebufferAllocator: VNCFramebufferAllocator?,
+		 context: UnsafeMutableRawPointer?,
+		 clipboard: any VNCClipboardAccessing) {
         self.settings = settings
 
         logger.isDebugLoggingEnabled = settings.isDebugLoggingEnabled
@@ -204,8 +216,6 @@ public final class VNCConnection: NSObjectOrAnyObject {
         
         self.sharedZStream = .init()
         self.sharedZRLEZStream = .init()
-
-        let clipboard = VNCClipboard()
 
         let clipboardMonitor = VNCClipboardMonitor(clipboard: clipboard,
                                                    monitoringInterval: 0.5,

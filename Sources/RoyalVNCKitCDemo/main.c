@@ -370,6 +370,7 @@ int main(int argc, char *argv[]) {
     const bool useDisplayLink = false;
     const RVNC_INPUTMODE inputMode = RVNC_INPUTMODE_NONE;
     const bool isClipboardRedirectionEnabled = false;
+    const bool isClipboardAutoSyncEnabled = true;
     const RVNC_COLORDEPTH colorDepth = RVNC_COLORDEPTH_24BIT;
     const bool enableDebugLogging = true;
 
@@ -398,16 +399,17 @@ int main(int argc, char *argv[]) {
     rvnc_frame_encodings_t frameEncodings = NULL;
 
     // Create settings
-    rvnc_settings_t settings = rvnc_settings_create(enableDebugLogging,
-                                                    hostname,
-                                                    port,
-                                                    isShared,
-                                                    isScalingEnabled,
-                                                    useDisplayLink,
-                                                    inputMode,
-                                                    isClipboardRedirectionEnabled,
-                                                    colorDepth,
-                                                    frameEncodings); // optional!
+    rvnc_settings_t settings = rvnc_settings_create_with_clipboard_auto_sync(enableDebugLogging,
+                                                                             hostname,
+                                                                             port,
+                                                                             isShared,
+                                                                             isScalingEnabled,
+                                                                             useDisplayLink,
+                                                                             inputMode,
+                                                                             isClipboardRedirectionEnabled,
+                                                                             isClipboardAutoSyncEnabled,
+                                                                             colorDepth,
+                                                                             frameEncodings); // optional!
 
     // Create connection
     rvnc_connection_t connection = rvnc_connection_create(settings,

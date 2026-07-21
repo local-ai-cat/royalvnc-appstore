@@ -10,6 +10,7 @@ public interface IVncSettings
     public InputMode InputMode { get; }
     public ColorDepth ColorDepth { get; }
     public bool IsClipboardRedirectionEnabled { get; }
+    public bool IsClipboardAutoSyncEnabled => true;
     public bool IsDebugLoggingEnabled { get; }
     public bool IsScalingEnabled { get; }
     public bool IsShared { get; }
@@ -44,7 +45,7 @@ public sealed unsafe class VncSettings: IDisposable
                 ? frameEncodings.Instance
                 : null;
 
-            Instance = rvnc_settings_create(
+            Instance = rvnc_settings_create_with_clipboard_auto_sync(
                 settings.IsDebugLoggingEnabled.ToNativeBool(),
                 settings.Hostname,
                 settings.Port,
@@ -53,6 +54,7 @@ public sealed unsafe class VncSettings: IDisposable
                 settings.UseDisplayLink.ToNativeBool(),
                 settings.InputMode,
                 settings.IsClipboardRedirectionEnabled.ToNativeBool(),
+                settings.IsClipboardAutoSyncEnabled.ToNativeBool(),
                 settings.ColorDepth,
                 frameEncodingsC
             );

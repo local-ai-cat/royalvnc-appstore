@@ -10,7 +10,12 @@ import AppKit
 import UIKit
 #endif
 
-final class VNCClipboard {
+protocol VNCClipboardAccessing: AnyObject {
+	var text: String? { get set }
+	var changeCount: Int { get }
+}
+
+final class VNCClipboard: VNCClipboardAccessing {
 #if os(macOS)
 	let pasteboard: NSPasteboard
 #elseif os(iOS)

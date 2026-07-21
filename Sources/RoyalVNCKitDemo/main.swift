@@ -45,6 +45,7 @@ let settings = VNCConnection.Settings(isDebugLoggingEnabled: true,
                                       useDisplayLink: false,
                                       inputMode: .none,
                                       isClipboardRedirectionEnabled: false,
+                                      isClipboardAutoSyncEnabled: true,
                                       colorDepth: .depth24Bit,
                                       frameEncodings: .default)
 

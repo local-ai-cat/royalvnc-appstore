@@ -30,4 +30,8 @@ struct Queue<T> {
 	var isEmpty: Bool {
 		list.isEmpty
 	}
+
+	var count: Int {
+		list.count
+	}
 }

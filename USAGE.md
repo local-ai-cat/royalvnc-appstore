@@ -14,6 +14,7 @@ let settings = VNCConnection.Settings(
     useDisplayLink: true,
     inputMode: .forwardKeyboardShortcutsEvenIfInUseLocally,
     isClipboardRedirectionEnabled: true,
+    isClipboardAutoSyncEnabled: true,
     colorDepth: .depth24Bit,
     frameEncodings: .default
 )

@@ -107,9 +107,7 @@ private extension VNCConnection {
 
 		logger.logDebug("Received Clipboard Text from Server")
 
-		guard settings.isClipboardRedirectionEnabled else { return }
-
-		clipboard.text = text
+		updateClipboardFromServer(text)
 	}
 
 	func handleBellMessage() async throws {
@@ -136,5 +134,13 @@ private extension VNCConnection {
 		}
 
 		try await sendFramebufferUpdateRequest()
+	}
+}
+
+extension VNCConnection {
+	func updateClipboardFromServer(_ text: String) {
+		guard settings.isClipboardRedirectionEnabled else { return }
+
+		clipboard.text = text
 	}
 }

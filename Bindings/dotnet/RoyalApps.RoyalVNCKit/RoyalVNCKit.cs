@@ -121,6 +121,22 @@ static unsafe partial class RoyalVNCKit
 
     [LibraryImport(libRoyalVNCKit, StringMarshalling = Utf8Marshalling)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    internal static partial void* rvnc_settings_create_with_clipboard_auto_sync(
+        byte isDebugLoggingEnabled,
+        string hostname,
+        ushort port,
+        byte isShared,
+        byte isScalingEnabled,
+        byte useDisplayLink,
+        InputMode inputMode,
+        byte isClipboardRedirectionEnabled,
+        byte isClipboardAutoSyncEnabled,
+        ColorDepth colorDepth,
+        void* frameEncodings
+    );
+
+    [LibraryImport(libRoyalVNCKit, StringMarshalling = Utf8Marshalling)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     internal static partial void rvnc_settings_destroy(void* settings);
 
     [LibraryImport(libRoyalVNCKit, StringMarshalling = Utf8Marshalling)]
