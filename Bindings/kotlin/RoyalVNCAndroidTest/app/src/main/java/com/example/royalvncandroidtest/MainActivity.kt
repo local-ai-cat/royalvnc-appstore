@@ -152,6 +152,7 @@ class MainActivity :
             false,
             VncInputMode.FORWARDKEYBOARDSHORTCUTSEVENIFINUSELOCALLY,
             false,
+            true,
             VncColorDepth.BIT24,
             frameEncodings
         )

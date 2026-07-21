@@ -59,6 +59,7 @@ extension VNCConnection.Settings {
 @_cdecl("rvnc_settings_create")
 @_spi(RoyalVNCKitC)
 @available(*, unavailable)
+// swiftlint:disable:next function_parameter_count
 public func rvnc_settings_create(_ isDebugLoggingEnabled: Bool,
                                  _ hostname: UnsafePointer<CChar>,
                                  _ port: UInt16,
@@ -69,12 +70,65 @@ public func rvnc_settings_create(_ isDebugLoggingEnabled: Bool,
                                  _ isClipboardRedirectionEnabled: Bool,
                                  _ colorDepth: RVNC_COLORDEPTH,
                                  _ frameEncodings: rvnc_frame_encodings_t?) -> rvnc_settings_t {
+    makeVNCSettings(isDebugLoggingEnabled,
+                    hostname,
+                    port,
+                    isShared,
+                    isScalingEnabled,
+                    useDisplayLink,
+                    inputMode,
+                    isClipboardRedirectionEnabled,
+                    true,
+                    colorDepth,
+                    frameEncodings)
+}
+
+@_cdecl("rvnc_settings_create_with_clipboard_auto_sync")
+@_spi(RoyalVNCKitC)
+@available(*, unavailable)
+// swiftlint:disable:next function_parameter_count
+public func rvnc_settings_create_with_clipboard_auto_sync(_ isDebugLoggingEnabled: Bool,
+                                                          _ hostname: UnsafePointer<CChar>,
+                                                          _ port: UInt16,
+                                                          _ isShared: Bool,
+                                                          _ isScalingEnabled: Bool,
+                                                          _ useDisplayLink: Bool,
+                                                          _ inputMode: RVNC_INPUTMODE,
+                                                          _ isClipboardRedirectionEnabled: Bool,
+                                                          _ isClipboardAutoSyncEnabled: Bool,
+                                                          _ colorDepth: RVNC_COLORDEPTH,
+                                                          _ frameEncodings: rvnc_frame_encodings_t?) -> rvnc_settings_t {
+    makeVNCSettings(isDebugLoggingEnabled,
+                    hostname,
+                    port,
+                    isShared,
+                    isScalingEnabled,
+                    useDisplayLink,
+                    inputMode,
+                    isClipboardRedirectionEnabled,
+                    isClipboardAutoSyncEnabled,
+                    colorDepth,
+                    frameEncodings)
+}
+
+// swiftlint:disable:next function_parameter_count
+private func makeVNCSettings(_ isDebugLoggingEnabled: Bool,
+                             _ hostname: UnsafePointer<CChar>,
+                             _ port: UInt16,
+                             _ isShared: Bool,
+                             _ isScalingEnabled: Bool,
+                             _ useDisplayLink: Bool,
+                             _ inputMode: RVNC_INPUTMODE,
+                             _ isClipboardRedirectionEnabled: Bool,
+                             _ isClipboardAutoSyncEnabled: Bool,
+                             _ colorDepth: RVNC_COLORDEPTH,
+                             _ frameEncodings: rvnc_frame_encodings_t?) -> rvnc_settings_t {
     let hostnameStr = String(cString: hostname)
 
     let inputModeSwift = inputMode.swiftInputMode
     let colorDepthSwift = colorDepth.swiftColorDepth
     let frameEncodingsSwift: [VNCFrameEncodingType]
-    
+
     if let frameEncodings {
         frameEncodingsSwift = VNCFrameEncodings_C.fromPointer(frameEncodings)
             .frameEncodings
@@ -90,6 +144,7 @@ public func rvnc_settings_create(_ isDebugLoggingEnabled: Bool,
                                           useDisplayLink: useDisplayLink,
                                           inputMode: inputModeSwift,
                                           isClipboardRedirectionEnabled: isClipboardRedirectionEnabled,
+                                          isClipboardAutoSyncEnabled: isClipboardAutoSyncEnabled,
                                           colorDepth: colorDepthSwift,
                                           frameEncodings: frameEncodingsSwift)
 

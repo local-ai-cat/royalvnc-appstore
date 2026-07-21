@@ -299,6 +299,24 @@ extern rvnc_settings_t _Nonnull rvnc_settings_create(bool isDebugLoggingEnabled,
                                                      rvnc_frame_encodings_t _Nullable frameEncodings);
 
 /**
+ * Creates settings with independent control over automatic client-to-server clipboard polling.
+ * The returned settings object must be destroyed using `rvnc_settings_destroy`.
+ * param isClipboardAutoSyncEnabled Enables automatic local clipboard polling if true.
+ * Other parameters match `rvnc_settings_create`.
+ */
+extern rvnc_settings_t _Nonnull rvnc_settings_create_with_clipboard_auto_sync(bool isDebugLoggingEnabled,
+                                                                              const char* _Nonnull hostname,
+                                                                              uint16_t port,
+                                                                              bool isShared,
+                                                                              bool isScalingEnabled,
+                                                                              bool useDisplayLink,
+                                                                              RVNC_INPUTMODE inputMode,
+                                                                              bool isClipboardRedirectionEnabled,
+                                                                              bool isClipboardAutoSyncEnabled,
+                                                                              RVNC_COLORDEPTH colorDepth,
+                                                                              rvnc_frame_encodings_t _Nullable frameEncodings);
+
+/**
  * Destroys a settings instance and releases its resources.
  * \param settings The settings instance to destroy.
  */
