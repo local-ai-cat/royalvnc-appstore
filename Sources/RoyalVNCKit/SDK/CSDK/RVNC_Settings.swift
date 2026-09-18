@@ -4,7 +4,7 @@ import FoundationEssentials
 import Foundation
 #endif
 
-@_implementationOnly import RoyalVNCKitC
+internal import RoyalVNCKitC
 
 extension RVNC_INPUTMODE {
     var swiftInputMode: VNCConnection.Settings.InputMode {
@@ -57,10 +57,9 @@ extension VNCConnection.Settings {
 }
 
 @_cdecl("rvnc_settings_create")
-@_spi(RoyalVNCKitC)
 @available(*, unavailable)
 // swiftlint:disable:next function_parameter_count
-public func rvnc_settings_create(_ isDebugLoggingEnabled: Bool,
+func rvnc_settings_create(_ isDebugLoggingEnabled: Bool,
                                  _ hostname: UnsafePointer<CChar>,
                                  _ port: UInt16,
                                  _ isShared: Bool,
@@ -84,10 +83,9 @@ public func rvnc_settings_create(_ isDebugLoggingEnabled: Bool,
 }
 
 @_cdecl("rvnc_settings_create_with_clipboard_auto_sync")
-@_spi(RoyalVNCKitC)
 @available(*, unavailable)
 // swiftlint:disable:next function_parameter_count
-public func rvnc_settings_create_with_clipboard_auto_sync(_ isDebugLoggingEnabled: Bool,
+func rvnc_settings_create_with_clipboard_auto_sync(_ isDebugLoggingEnabled: Bool,
                                                           _ hostname: UnsafePointer<CChar>,
                                                           _ port: UInt16,
                                                           _ isShared: Bool,
@@ -152,8 +150,7 @@ private func makeVNCSettings(_ isDebugLoggingEnabled: Bool,
 }
 
 @_cdecl("rvnc_settings_destroy")
-@_spi(RoyalVNCKitC)
 @available(*, unavailable)
-public func rvnc_settings_destroy(_ settings: rvnc_settings_t) {
+func rvnc_settings_destroy(_ settings: rvnc_settings_t) {
     VNCConnection.Settings.autoreleasePointer(settings)
 }

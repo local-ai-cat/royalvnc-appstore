@@ -4,7 +4,7 @@ import FoundationEssentials
 import Foundation
 #endif
 
-@_implementationOnly import RoyalVNCKitC
+internal import RoyalVNCKitC
 
 final class VNCAuthenticationRequest_C {
     typealias CompletionHandler = ((any VNCCredential)?) -> Void
@@ -60,18 +60,16 @@ extension VNCAuthenticationRequest_C {
 }
 
 @_cdecl("rvnc_authentication_request_authentication_type_get")
-@_spi(RoyalVNCKitC)
 @available(*, unavailable)
-public func rvnc_authentication_request_authentication_type_get(_ authenticationRequest: rvnc_authentication_request_t) -> RVNC_AUTHENTICATIONTYPE {
+func rvnc_authentication_request_authentication_type_get(_ authenticationRequest: rvnc_authentication_request_t) -> RVNC_AUTHENTICATIONTYPE {
     VNCAuthenticationRequest_C.fromPointer(authenticationRequest)
         .authenticationType
         .cVNCAuthenticationType
 }
 
 @_cdecl("rvnc_authentication_request_cancel")
-@_spi(RoyalVNCKitC)
 @available(*, unavailable)
-public func rvnc_authentication_request_cancel(_ authenticationRequest: rvnc_authentication_request_t) {
+func rvnc_authentication_request_cancel(_ authenticationRequest: rvnc_authentication_request_t) {
     let authenticationRequestSwift = VNCAuthenticationRequest_C.fromPointer(authenticationRequest)
 
     defer {
@@ -82,9 +80,8 @@ public func rvnc_authentication_request_cancel(_ authenticationRequest: rvnc_aut
 }
 
 @_cdecl("rvnc_authentication_request_complete_with_username_password")
-@_spi(RoyalVNCKitC)
 @available(*, unavailable)
-public func rvnc_authentication_request_complete_with_username_password(_ authenticationRequest: rvnc_authentication_request_t,
+func rvnc_authentication_request_complete_with_username_password(_ authenticationRequest: rvnc_authentication_request_t,
                                                                         _ username: UnsafePointer<CChar>,
                                                                         _ password: UnsafePointer<CChar>) {
     let authenticationRequestSwift = VNCAuthenticationRequest_C.fromPointer(authenticationRequest)
@@ -98,9 +95,8 @@ public func rvnc_authentication_request_complete_with_username_password(_ authen
 }
 
 @_cdecl("rvnc_authentication_request_complete_with_password")
-@_spi(RoyalVNCKitC)
 @available(*, unavailable)
-public func rvnc_authentication_request_complete_with_password(_ authenticationRequest: rvnc_authentication_request_t,
+func rvnc_authentication_request_complete_with_password(_ authenticationRequest: rvnc_authentication_request_t,
                                                                _ password: UnsafePointer<CChar>) {
     let authenticationRequestSwift = VNCAuthenticationRequest_C.fromPointer(authenticationRequest)
 

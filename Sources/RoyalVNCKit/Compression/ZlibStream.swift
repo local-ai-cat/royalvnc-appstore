@@ -4,7 +4,7 @@ import FoundationEssentials
 import Foundation
 #endif
 
-@_implementationOnly import Z
+internal import Z
 
 enum ZlibDeflateError: Error {
 	case compressionFailed(status: Int32)
