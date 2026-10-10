@@ -43,23 +43,26 @@ private extension VNCProtocol.UltraVNCMSLogonIIAuthentication.DiffieHellmanKeyAg
 
     static func generateKeyPair(generator: Data,
                                 modulus: Data) -> KeyPair? {
-		let generatorNum = UltraVNCBigNum.dataToBigNum(generator)
-        guard generatorNum < maxNum else { return nil }
+        guard let generatorNum = BigNum(data: generator),
+              generatorNum.isLessThan(maxNum) else {
+            return nil
+        }
+        
+        guard let modulusNum = BigNum(data: modulus),
+              modulusNum.isLessThan(maxNum) else {
+            return nil
+        }
+        
+        let privNum = BigNum.randomNumber(lessThan: maxNum)
+        guard privNum.isLessThan(maxNum) else { return nil }
+        
+        guard let privData = privNum.fixedWidthBigEndianData(length: 8) else { return nil }
 
-		let modulusNum = UltraVNCBigNum.dataToBigNum(modulus)
-        guard modulusNum < maxNum else { return nil }
-
-		let privNum = UltraVNCBigNum.randomBigNum(max: .init(maxNum))
-        guard privNum < maxNum else { return nil }
-
-		let privData = UltraVNCBigNum.bigNumToData(privNum)
-
-		let pubNum = UltraVNCBigNum.powM64(b: .init(generatorNum),
-									   e: .init(privNum),
-									   m: .init(modulusNum))
-
-		let pubData = UltraVNCBigNum.bigNumToData(.init(pubNum))
-
+        let pubNum = generatorNum.power(exponent: privNum,
+                                        modulus: modulusNum)
+        
+        guard let pubData = pubNum.fixedWidthBigEndianData(length: 8) else { return nil }
+        
         let keyPair = KeyPair(publicKey: pubData,
                               privateKey: privData)
 
@@ -69,17 +72,18 @@ private extension VNCProtocol.UltraVNCMSLogonIIAuthentication.DiffieHellmanKeyAg
     static func computeSharedKey(modulus: Data,
                                  resp: Data,
                                  privateKey: Data) -> Data? {
-		let privNum = UltraVNCBigNum.dataToBigNum(privateKey)
-		let modulusNum = UltraVNCBigNum.dataToBigNum(modulus)
+        guard let privNum = BigNum(data: privateKey) else { return nil }
+        guard let modulusNum = BigNum(data: modulus) else { return nil }
 
-		let respNum = UltraVNCBigNum.dataToBigNum(resp)
-        guard respNum < maxNum else { return nil }
+        guard let respNum = BigNum(data: resp),
+              respNum.isLessThan(maxNum) else {
+            return nil
+        }
 
-		let keyNum = UltraVNCBigNum.powM64(b: .init(respNum),
-									   e: .init(privNum),
-									   m: .init(modulusNum))
+        let keyNum = respNum.power(exponent: privNum,
+                                   modulus: modulusNum)
 
-		let keyData = UltraVNCBigNum.bigNumToData(.init(keyNum))
+        let keyData = keyNum.fixedWidthBigEndianData(length: 8)
 
         return keyData
     }

@@ -53,6 +53,7 @@ extension VNCProtocol.UltraVNCMSLogonIIAuthentication {
 private extension VNCProtocol.UltraVNCMSLogonIIAuthentication.Authentication {
     static func cappedOrPaddedStringData(string: String,
                                          length: Int) -> Data? {
+        // NOTE: UltraVNC MS-Logon II has issues with Umlauts and other funky characters. Research showed that other VNC clients that implement MS-Logon II also encode using UTF8 and also fail to authenticate if the username and/or password contains Umlauts. UltraVNC's viewer works fine but I'm not sure which encoding it uses. While passing `.windowsCP1252` here instead of `.utf8` works in my tests, it might break in other configurations so we'll continue using `.utf8`. Also, that's what's documented in the RFB spec.
         guard var data = string.data(using: .utf8) else { return nil }
 
         if data.count > length {
