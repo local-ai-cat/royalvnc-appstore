@@ -4,7 +4,7 @@ import FoundationEssentials
 import Foundation
 #endif
 
-@_implementationOnly import RoyalVNCKitC
+public import RoyalVNCKitC
 
 extension VNCCursor {
     func retainedPointer() -> rvnc_cursor_t {
